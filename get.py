@@ -39,15 +39,15 @@ for section in soup.find_all("section"):
         password= "null"
         method  = "null"
         is_got = 0
-        for field in account.find_all("h4"):
-            # a line of text of a single account
-            #print(field)
 
+        for field in account.find_all("h4"):
+            #print(field)
             if is_got == 4:
                 server_list.append( SSServer( address, port, password, method ) )
-                continue
+                break
+
             result = field.string.split(':')
-            #print( result[0], "-->", result[1] )
+
             if is_got == 0:
                 address = result[1]
             if is_got == 1:
@@ -58,6 +58,8 @@ for section in soup.find_all("section"):
                 method = result[1]
 
             is_got = is_got + 1
+        pass
+    pass
 
 for i in server_list:
     print( i.address, i.port, i.password, i.method )
