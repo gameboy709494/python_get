@@ -1,70 +1,65 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
-import urllib2
 
+import urllib.request
 from bs4 import BeautifulSoup
 
-from HTMLParser import HTMLParser
+
+request = urllib.request.urlopen("http://www.ishadowsocks.com")
+soup = BeautifulSoup(request.read(), "lxml")
 
 
-request = urllib2.Request("http://www.ishadowsocks.com")
-file = urllib2.urlopen(request)
-content = file.read()
-
-#print content
-
-
-soup = BeautifulSoup(content)
-
-sections = soup.find_all("section")
-
-print sections
-
-sections = soup.find_all(id="free")
-
-print sections
+class SSServer:
+    address = "null"
+    port    = 0
+    password= "null"
+    method  = "null"
+    def __init__(self):
+        pass
+    def __init__(self, address, port, password, method):
+        self.address    = address
+        self.port       = port
+        self.password   = password
+        self.method     = method
 
 
-last_a_tag = soup.find("section", id="free")
-print last_a_tag
+server_list = []
 
-#class SSServer:
-#	def __init__(self, address, port, password):
-#		self.address = address
-#		self.port = port
-#		self.password = password
-#	def __init__(self):
-#		self.address = "null"
-#		self.port = 0
-#		self.password = "null"
-#
-#
-#class MyHTMLParser(HTMLParser):
-#	def handle_starttag(self, tag, attrs):
-#		if tag == 'section':
-#			for name,value in attrs:
-#class SSServer:
-#	def __init__(self, address, port, password):
-#		self.address = address
-#		self.port = port
-#		self.password = password
-#	def __init__(self):
-#		self.address = "null"
-#		self.port = 0
-#		self.password = "null"
-#
-#
-#class MyHTMLParser(HTMLParser):
-#	def handle_starttag(self, tag, attrs):
-#		if tag == 'section':
-#			for name,value in attrs:
-#				if name == 'id' and value == "free":
-#					#The tag contain what i want.
-#					print "hello!!"
-#
-#
-#
+for section in soup.find_all("section"):
+    if section.get("id") != "free":
+        # not the "free" section we wanted
+        continue
 
-#result_list = [] 
-#my = MyHTMLParser()
-#my.feed(content)
+    # got it
+    for account in section.find_all(class_="col-lg-4 text-center"):
+        # walk through all accounts
+        #print("-------------")
+        address = "null"
+        port    = 0
+        password= "null"
+        method  = "null"
+        is_got = 0
+        for field in account.find_all("h4"):
+            # a line of text of a single account
+            #print(field)
+
+            if is_got == 4:
+                server_list.append( SSServer( address, port, password, method ) )
+                continue
+            result = field.string.split(':')
+            #print( result[0], "-->", result[1] )
+            if is_got == 0:
+                address = result[1]
+            if is_got == 1:
+                port = result[1]
+            if is_got == 2:
+                password = result[1]
+            if is_got == 3:
+                method = result[1]
+
+            is_got = is_got + 1
+
+for i in server_list:
+    print( i.address, i.port, i.password, i.method )
+
+
